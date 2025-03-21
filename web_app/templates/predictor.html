@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Readmission Predictor - Healthcare Readmission Analytics</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Healthcare Readmission Analytics</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/predictor">Readmission Predictor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/methodology">Methodology</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Readmission Risk Predictor</h1>
+        <p class="lead">Enter patient information to predict readmission risk.</p>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Patient Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="predictionForm">
+                            <div class="mb-3">
+                                <label for="age" class="form-label">Age</label>
+                                <input type="number" class="form-control" id="age" name="age" min="0" max="100" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="" selected disabled>Select gender</option>
+                                    <option value="0">Male</option>
+                                    <option value="1">Female</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="race" class="form-label">Race</label>
+                                <select class="form-select" id="race" name="race" required>
+                                    <option value="" selected disabled>Select race</option>
+                                    <option value="0">Caucasian</option>
+                                    <option value="1">African American</option>
+                                    <option value="2">Hispanic</option>
+                                    <option value="3">Asian</option>
+                                    <option value="4">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="time_in_hospital" class="form-label">Time in Hospital (days)</label>
+                                <input type="number" class="form-control" id="time_in_hospital" name="time_in_hospital" min="1" max="14" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="num_lab_procedures" class="form-label">Number of Lab Procedures</label>
+                                <input type="number" class="form-control" id="num_lab_procedures" name="num_lab_procedures" min="0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="num_procedures" class="form-label">Number of Procedures</label>
+                                <input type="number" class="form-control" id="num_procedures" name="num_procedures" min="0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="num_medications" class="form-label">Number of Medications</label>
+                                <input type="number" class="form-control" id="num_medications" name="num_medications" min="0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="number_outpatient" class="form-label">Number of Outpatient Visits</label>
+                                <input type="number" class="form-control" id="number_outpatient" name="number_outpatient" min="0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="number_emergency" class="form-label">Number of Emergency Visits</label>
+                                <input type="number" class="form-control" id="number_emergency" name="number_emergency" min="0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="number_inpatient" class="form-label">Number of Inpatient Visits</label>
+                                <input type="number" class="form-control" id="number_inpatient" name="number_inpatient" min="0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="number_diagnoses" class="form-label">Number of Diagnoses</label>
+                                <input type="number" class="form-control" id="number_diagnoses" name="number_diagnoses" min="1" max="16" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="max_glu_serum" class="form-label">Max Glucose Serum Test Result</label>
+                                <select class="form-select" id="max_glu_serum" name="max_glu_serum" required>
+                                    <option value="" selected disabled>Select result</option>
+                                    <option value="0">None</option>
+                                    <option value="1">Normal</option>
+                                    <option value="2">>200</option>
+                                    <option value="3">>300</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="a1c_result" class="form-label">A1C Test Result</label>
+                                <select class="form-select" id="a1c_result" name="a1c_result" required>
+                                    <option value="" selected disabled>Select result</option>
+                                    <option value="0">None</option>
+                                    <option value="1">Normal</option>
+                                    <option value="2">>7</option>
+                                    <option value="3">>8</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="admission_type" class="form-label">Admission Type</label>
+                                <select class="form-select" id="admission_type" name="admission_type" required>
+                                    <option value="" selected disabled>Select type</option>
+                                    <option value="1">Emergency</option>
+                                    <option value="2">Urgent</option>
+                                    <option value="3">Elective</option>
+                                    <option value="4">Newborn</option>
+                                    <option value="5">Not Available</option>
+                                    <option value="7">Trauma Center</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="discharge_disposition" class="form-label">Discharge Disposition</label>
+                                <select class="form-select" id="discharge_disposition" name="discharge_disposition" required>
+                                    <option value="" selected disabled>Select disposition</option>
+                                    <option value="1">Discharged to home</option>
+                                    <option value="2">Discharged to another hospital</option>
+                                    <option value="3">Discharged to SNF</option>
+                                    <option value="6">Home with home health service</option>
+                                    <option value="8">Home with Home IV provider</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="admission_source" class="form-label">Admission Source</label>
+                                <select class="form-select" id="admission_source" name="admission_source" required>
+                                    <option value="" selected disabled>Select source</option>
+                                    <option value="1">Physician Referral</option>
+                                    <option value="2">Clinic Referral</option>
+                                    <option value="4">Transfer from hospital</option>
+                                    <option value="7">Emergency Room</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Predict Readmission Risk</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div id="predictionResult" style="display: none;">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Prediction Result</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <div id="riskGauge" style="height: 250px;"></div>
+                            </div>
+                            
+                            <div class="alert" id="riskAlert" role="alert">
+                                <h4 class="alert-heading" id="riskHeading">Risk Level: <span id="riskLevel"></span></h4>
+                                <p id="riskDescription"></p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>Key Risk Factors:</h5>
+                                <ul id="riskFactorsList" class="list-group">
+                                    <!-- Risk factors will be added here -->
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h5>Recommended Interventions:</h5>
+                                <ul id="interventionsList" class="list-group">
+                                    <!-- Interventions will be added here -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">How It Works</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>This readmission risk predictor uses advanced machine learning models trained on the Diabetes 130-US hospitals dataset to estimate the probability of patient readmission.</p>
+                        
+                        <h6>Key Predictors:</h6>
+                        <ul>
+                            <li><strong>Number of inpatient visits</strong> - Strongest predictor (correlation: 0.217)</li>
+                            <li><strong>Number of diagnoses</strong> - Second strongest predictor (correlation: 0.113)</li>
+                            <li><strong>Number of emergency visits</strong> - Third strongest predictor (correlation: 0.103)</li>
+                            <li><strong>Age</strong> - Patients over 70 have 47.69% readmission rate</li>
+                            <li><strong>Time in hospital</strong> - Longer stays correlate with higher readmission risk</li>
+                        </ul>
+                        
+                        <p>The model achieves over 90% accuracy using ensemble methods and advanced feature engineering techniques.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Healthcare Readmission Predictive Analytics</h5>
+                    <p>A machine learning approach to reducing hospital readmissions</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>Data Source: Diabetes 130-US hospitals dataset</p>
+                    <p>&copy; 2025 Healthcare Analytics Project</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#predictionForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form data
+                var formData = $(this).serialize();
+                
+                // Send AJAX request
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.error) {
+                            alert('Error: ' + response.error);
+                            return;
+                        }
+                        
+                        // Show prediction result
+                        $('#predictionResult').show();
+                        
+                        // Update risk level
+                        $('#riskLevel').text(response.risk_level);
+                        
+                        // Update risk alert
+                        $('#riskAlert').removeClass('alert-success alert-warning alert-danger');
+                        $('#riskAlert').addClass('alert-' + (response.risk_level === 'Low' ? 'success' : (response.risk_level === 'Medium' ? 'warning' : 'danger')));
+                        
+                        // Update risk description
+                        if (response.prediction === 1) {
+                            $('#riskDescription').text('This patient is predicted to be readmitted with a probability of ' + response.probability.toFixed(1) + '%.');
+                        } else {
+                            $('#riskDescription').text('This patient is predicted not to be readmitted with a probability of ' + (100 - response.probability).toFixed(1) + '%.');
+                        }
+                        
+                        // Update risk factors list
+                        $('#riskFactorsList').empty();
+                        if (response.risk_factors.length > 0) {
+                            response.risk_factors.forEach(function(factor) {
+                                $('#riskFactorsList').append('<li class="list-group-item">' + factor + '</li>');
+                            });
+                        } else {
+                            $('#riskFactorsList').append('<li class="list-group-item">No significant risk factors identified</li>');
+                        }
+                        
+                        // Update interventions list
+                        $('#interventionsList').empty();
+                        if (response.interventions.length > 0) {
+                            response.interventions.forEach(function(intervention) {
+                                $('#interventionsList').append('<li class="list-group-item">' + intervention + '</li>');
+                            });
+                        } else {
+                            $('#interventionsList').append('<li class="list-group-item">No specific interventions recommended</li>');
+                        }
+                        
+                        // Create gauge chart
+                        var gaugeData = [
+                            {
+                                type: "indicator",
+                                mode: "gauge+number",
+                                value: response.probability,
+                                title: { text: "Readmission Risk (%)" },
+                                gauge: {
+                                    axis: { range: [0, 100] },
+                                    bar: { color: response.risk_color },
+                                    steps: [
+                                        { range: [0, 30], color: "#4CAF50" },
+                                        { range: [30, 60], color: "#FFC107" },
+                                        { range: [60, 100], color: "#F44336" }
+                                    ],
+                                    threshold: {
+                                        line: { color: "black", width: 4 },
+                                        thickness: 0.75,
+                                        value: response.probability
+                                    }
+                                }
+                            }
+                        ];
+                        
+                        var gaugeLayout = {
+                            margin: { t: 25, r: 25, l: 25, b: 25 },
+                            height: 250
+                        };
+                        
+                        Plotly.newPlot('riskGauge', gaugeData, gaugeLayout);
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

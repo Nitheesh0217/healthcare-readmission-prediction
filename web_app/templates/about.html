@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Healthcare Readmission Analytics</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Healthcare Readmission Analytics</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/predictor">Readmission Predictor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/methodology">Methodology</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="mb-4">About the Project</h1>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Project Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>The Healthcare Readmission Predictive Analytics project aims to address one of the most significant challenges in healthcare management: patient readmissions. Hospital readmissions are a major healthcare challenge, leading to increased costs and burdening medical facilities.</p>
+                        
+                        <p>This project applies machine learning and statistical modeling to predict patient readmission risk based on medical history, demographics, and clinical parameters. By analyzing patterns in patient data, hospitals can implement preventive measures, optimize treatment plans, and reduce unnecessary readmissions.</p>
+                        
+                        <h5 class="mt-4">Project Objectives</h5>
+                        <ol>
+                            <li><strong>Predict Readmission Risk</strong>: Develop a machine learning model to classify whether a patient will be readmitted.</li>
+                            <li><strong>Data-Driven Decision Making</strong>: Analyze key medical and demographic factors influencing readmissions.</li>
+                            <li><strong>Interactive Visualization</strong>: Create dashboards to visualize trends in readmissions.</li>
+                            <li><strong>SQL Integration</strong>: Store and retrieve patient data efficiently for scalability.</li>
+                        </ol>
+                        
+                        <h5 class="mt-4">Impact</h5>
+                        <p>This project has significant potential impact for healthcare providers:</p>
+                        <ul>
+                            <li>Reduce readmission rates by identifying high-risk patients</li>
+                            <li>Improve patient care through targeted interventions</li>
+                            <li>Optimize hospital resource allocation</li>
+                            <li>Reduce healthcare costs associated with preventable readmissions</li>
+                            <li>Support data-driven decision making in clinical settings</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Future Enhancements</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>While the current implementation provides valuable insights and predictive capabilities, several future enhancements are planned:</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Real-time Prediction API</h5>
+                                        <p class="card-text">Develop an API for real-time readmission risk prediction integrated with electronic health records.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Expanded Feature Set</h5>
+                                        <p class="card-text">Incorporate additional data sources such as medication details, lab values, and social determinants of health.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Temporal Analysis</h5>
+                                        <p class="card-text">Implement time-series analysis to understand how readmission risk changes over time.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Explainable AI</h5>
+                                        <p class="card-text">Enhance model interpretability to provide clinicians with more actionable insights.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Mobile Integration</h5>
+                                        <p class="card-text">Create a mobile application for healthcare providers to access risk predictions at the point of care.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Multi-hospital Deployment</h5>
+                                        <p class="card-text">Scale the solution to work across multiple healthcare facilities with different patient populations.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Data Source</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Dataset Name</strong>: Diabetes 130-US hospitals dataset</p>
+                        <p><strong>Source</strong>: UCI Machine Learning Repository</p>
+                        <p><strong>Records</strong>: 101,766 patient encounters</p>
+                        <p><strong>Time Period</strong>: 1999-2008</p>
+                        <p><strong>Hospitals</strong>: 130 US hospitals</p>
+                        
+                        <div class="alert alert-info mt-3">
+                            <p class="mb-0">This dataset is a benchmark for healthcare analytics research and provides a comprehensive view of diabetic patient care across the United States.</p>
+                        </div>
+                        
+                        <a href="https://archive.ics.uci.edu/ml/datasets/diabetes+130-us+hospitals+for+years+1999-2008" target="_blank" class="btn btn-primary mt-2">Visit Dataset Source</a>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Project Structure</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>The project is organized into the following components:</p>
+                        
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Data Processing
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Exploratory Analysis
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Machine Learning Models
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Advanced Models (>90% Accuracy)
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Interactive Dashboard
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Prediction Tool
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                SQL Database Integration
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Documentation
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Acknowledgments</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>This project utilizes the Diabetes 130-US hospitals dataset from the UCI Machine Learning Repository. We acknowledge the original data collectors and the UCI repository for making this valuable dataset available for research and development.</p>
+                        
+                        <h6 class="mt-3">References</h6>
+                        <ol>
+                            <li>UCI Machine Learning Repository: Diabetes 130-US hospitals for years 1999-2008 Data Set</li>
+                            <li>Strack, B., DeShazo, J. P., Gennings, C., Olmo, J. L., Ventura, S., Cios, K. J., & Clore, J. N. (2014). Impact of HbA1c measurement on hospital readmission rates: analysis of 70,000 clinical database patient records.</li>
+                            <li>Centers for Medicare & Medicaid Services. (2022). Hospital Readmissions Reduction Program.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Healthcare Readmission Predictive Analytics</h5>
+                    <p>A machine learning approach to reducing hospital readmissions</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>Data Source: Diabetes 130-US hospitals dataset</p>
+                    <p>&copy; 2025 Healthcare Analytics Project</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

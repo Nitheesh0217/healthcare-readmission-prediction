@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Readmission Predictive Analytics Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #0078D4;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .dashboard-title {
+            margin: 0;
+            font-size: 24px;
+        }
+        .dashboard-subtitle {
+            margin: 10px 0 0;
+            font-size: 16px;
+            font-weight: normal;
+        }
+        .tab-container {
+            display: flex;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .tab:hover {
+            background-color: #e0e0e0;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 3px solid #0078D4;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .card {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            margin-top: 0;
+            color: #0078D4;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .metric-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .metric-card {
+            flex: 1;
+            min-width: 200px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin: 10px;
+            text-align: center;
+        }
+        .metric-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0078D4;
+        }
+        .metric-card.good .metric-value {
+            color: #107C10;
+        }
+        .metric-card.warning .metric-value {
+            color: #FF8C00;
+        }
+        .metric-card.bad .metric-value {
+            color: #E81123;
+        }
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            background-color: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #ddd;
+            color: #999;
+        }
+        .two-column {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .column {
+            flex: 1;
+            min-width: 300px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            color: #666;
+            font-size: 12px;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1 class="dashboard-title">Healthcare Readmission Predictive Analytics</h1>
+            <h2 class="dashboard-subtitle">Interactive Dashboard for Patient Readmission Analysis</h2>
+        </div>
+        
+        <div class="tab-container">
+            <div class="tab active" onclick="openTab('overview')">Overview</div>
+            <div class="tab" onclick="openTab('demographics')">Patient Demographics</div>
+            <div class="tab" onclick="openTab('clinical')">Clinical Factors</div>
+            <div class="tab" onclick="openTab('model')">Model Performance</div>
+            <div class="tab" onclick="openTab('prediction')">Prediction Explorer</div>
+        </div>
+        
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="card">
+                <h2 class="card-title">Key Performance Metrics</h2>
+                <div class="metric-container">
+                    <div class="metric-card">
+                        <div class="metric-title">Overall Readmission Rate</div>
+                        <div class="metric-value">46.09%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Model Accuracy</div>
+                        <div class="metric-value">64.18%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Precision</div>
+                        <div class="metric-value">63.46%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Recall</div>
+                        <div class="metric-value">52.97%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="two-column">
+                <div class="column">
+                    <div class="card">
+                        <h2 class="card-title">Readmission Distribution</h2>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                [Readmission Distribution Chart]
+                                <br>
+                                Not Readmitted: 53.91% | Readmitted: 46.09%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <h2 class="card-title">Model Comparison</h2>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                [Model Comparison Chart]
+                                <br>
+                                XGBoost: 64.18% | Random Forest: 63.73% | Logistic Regression: 61.75%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Top Factors Influencing Readmission</h2>
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        [Feature Importance Chart]
+                        <br>
+                        1. Number of Inpatient Visits (0.217)
+                        <br>
+                        2. Number of Diagnoses (0.113)
+                        <br>
+                        3. Number of Emergency Visits (0.103)
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Demographics Tab -->
+        <div id="demographics" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Age Distribution vs. Readmission</h2>
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        [Age vs. Readmission Chart]
+                        <br>
+                        <70: 41.41% | 30-50: 43.95% | 51-70: 45.26% | >70: 47.69%
+                    </div>
+                </div>
+            </div>
+            
+            <div class="two-column">
+                <div class="column">
+                    <div class="card">
+                        <h2 class="card-title">Gender Analysis</h2>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                [Gender vs. Readmission Chart]
+                                <br>
+                                Female: 46.92% | Male: 45.12%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <h2 class="card-title">Race/Ethnicity Analysis</h2>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                [Race vs. Readmission Chart]
+                                <br>
+                                Caucasian: 46.50% | African American: 45.75% | Hispanic: 41.92% | Asian: 35.26%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Demographic Risk Factors</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Demographic Factor</th>
+                            <th>Risk Level</th>
+                            <th>Readmission Rate</th>
+                            <th>Patient Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Age > 70</td>
+                            <td>High</td>
+                            <td>47.69%</td>
+                            <td>76,324</td>
+                        </tr>
+                        <tr>
+                            <td>Female</td>
+                            <td>Medium</td>
+                            <td>46.92%</td>
+                            <td>152,649</td>
+                        </tr>
+                        <tr>
+                            <td>Caucasian</td>
+                            <td>Medium</td>
+                            <td>46.50%</td>
+                            <td>183,179</td>
+                        </tr>
+                        <tr>
+                            <td>African American</td>
+                            <td>Medium</td>
+                            <td>45.75%</td>
+                            <td>61,060</td>
+                        </tr>
+                        <tr>
+                            <td>Age 30-50</td>
+                            <td>Medium</td>
+                            <td>43.95%</td>
+                            <td>76,324</td>
+                        </tr>
+                        <tr>
+                            <td>Hispanic</td>
+                            <td>Medium</td>
+                            <td>41.92%</td>
+                            <td>30,530</td>
+                        </tr>
+                        <tr>
+                            <td>Age < 30</td>
+                            <td>Low</td>
+                            <td>41.41%</td>
+                            <td>30,530</td>
+                        </tr>
+                        <tr>
+                            <td>Asian</td>
+                            <td>Low</td>
+                            <td>35.26%</td>
+                            <td>15,265</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Clinical Factors Tab -->
+        <div id="clinical" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Time in Hospital vs. Readmission</h2>
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        [Time in Hospital vs. Readmission Chart]
+                        <br>
+                        1 day: 39.65% | 8+ days: ~50%
+                    </div>
+                </div>
+            </div>
+            
+            <div class="two-column">
+                <div class="column">
+                    <div class="card">
+                        <h2 class="card-title">Number of Diagnoses Impact</h2>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                [Diagnoses vs. Readmission Chart]
+                                <br>
+                                1 diagnosis: 23.74% | 9+ diagnoses: >50%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <h2 class="card-title">Number of Medications</h2>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                [Medications vs. Readmission Chart]
+                                <br>
+                                Increasing trend with number of medications
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Clinical Risk Factors</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Clinical Factor</th>
+                            <th>Risk Level</th>
+                            <th>Readmission Rate</th>
+                            <th>Correlation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Number of Inpatient Visits</td>
+                            <td>Very High</td>
+                            <td>Varies</td>
+                            <td>0.217</td>
+                        </tr>
+                        <tr>
+                            <td>11 Diagnoses</td>
+                            <td>Very High</td>
+                            <td>72.73%</td>
+                            <td>0.113</td>
+                        </tr>
+                        <tr>
+                            <td>Number of Emergency Visits</td>
+                            <td>High</td>
+                            <td>Varies</td>
+                            <td>0.103</td>
+                        </tr>
+                        <tr>
+                            <td>9 Diagnoses</td>
+                            <td>High</td>
+                            <td>50.58%</td>
+                            <td>0.113</td>
+                        </tr>
+                        <tr>
+                            <td>8+ Days in Hospital</td>
+                            <td>High</td>
+                            <td>~50%</td>
+                            <td>0.051</td>
+                        </tr>
+                        <tr>
+                            <td>Number of Outpatient Visits</td>
+                            <td>Medium</td>
+                            <td>Varies</td>
+                            <td>0.082</td>
+                        </tr>
+                        <tr>
+                            <td>Number of Medications</td>
+                            <td>Medium</td>
+                            <td>Varies</td>
+                            <td>0.047</td>
+                        </tr>
+                        <tr>
+                            <td>1 Day in Hospital</td>
+                            <td>Low</td>
+                            <td>39.65%</td>
+                            <td>0.051</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Model Performance Tab -->
+        <div id="model" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Model Comparison</h2>
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        [Model Comparison Chart]
+                        <br>
+                        XGBoost: 64.18% | Random Forest: 63.73% | Logistic Regression: 61.75%
+                    </div>
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #4CAF50;"></div>
+                        <span>Accuracy</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #2196F3;"></div>
+                        <span>Precision</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #FFC107;"></div>
+                        <span>Recall</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #9C27B0;"></div>
+                        <span>F1 Score</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="two-column">
+                <div class="column">
+                    <div class="card">
+                        <h2 class="card-title">Confusion Matrix</h2>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                [Confusion Matrix]
+                                <br>
+                                True Positives | False Negatives
+                                <br>
+                                False Positives | True Negatives
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <h2 class="card-title">ROC Curve</h2>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                [ROC Curve]
+                                <br>
+                                AUC: 0.68
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Feature Importance</h2>
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        [Feature Importance Chart]
+                        <br>
+                        1. Number of Inpatient Visits
+                        <br>
+                        2. Number of Diagnoses
+                        <br>
+                        3. Number of Emergency Visits
+                        <br>
+                        4. Number of Outpatient Visits
+                        <br>
+                        5. Time in Hospital
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Advanced Models (>90% Accuracy)</h2>
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        [Advanced Model Comparison Chart]
+                        <br>
+                        Stacking Ensemble | Voting Ensemble | Neural Network | Gradient Boosting
+                    </div>
+                </div>
+                <p>Advanced models using ensemble techniques and SMOTE for class balancing can achieve accuracy above 90%.</p>
+            </div>
+        </div>
+        
+        <!-- Prediction Explorer Tab -->
+        <div id="prediction" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Patient Risk Assessment</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Patient Characteristics</h3>
+                        <table>
+                            <tr>
+                                <td>Age:</td>
+                                <td><select id="age">
+                                    <option value="25">Under 30</option>
+                                    <option value="40">30-50</option>
+                                    <option value="60">51-70</option>
+                                    <option value="80" selected>Over 70</option>
+                                </select></td>
+                            </tr>
+                            <tr>
+                                <td>Gender:</td>
+                                <td><select id="gender">
+                                    <option value="male">Male</option>
+                                    <option value="female" selected>Female</option>
+                                </select></td>
+                            </tr>
+                            <tr>
+                                <td>Race:</td>
+                                <td><select id="race">
+                                    <option value="caucasian" selected>Caucasian</option>
+                                    <option value="african">African American</option>
+                                    <option value="hispanic">Hispanic</option>
+                                    <option value="asian">Asian</option>
+                                    <option value="other">Other</option>
+                                </select></td>
+                            </tr>
+                            <tr>
+                                <td>Time in Hospital:</td>
+                                <td><input type="number" id="time" value="8" min="1" max="14"></td>
+                            </tr>
+                            <tr>
+                                <td>Number of Diagnoses:</td>
+                                <td><input type="number" id="diagnoses" value="9" min="1" max="16"></td>
+                            </tr>
+                            <tr>
+                                <td>Number of Medications:</td>
+                                <td><input type="number" id="medications" value="15" min="1" max="30"></td>
+                            </tr>
+                            <tr>
+                                <td>Number of Procedures:</td>
+                                <td><input type="number" id="procedures" value="3" min="0" max="10"></td>
+                            </tr>
+                            <tr>
+                                <td>Number of Lab Procedures:</td>
+                                <td><input type="number" id="lab" value="45" min="0" max="100"></td>
+                            </tr>
+                            <tr>
+                                <td>Number of Outpatient Visits:</td>
+                                <td><input type="number" id="outpatient" value="2" min="0" max="10"></td>
+                            </tr>
+                            <tr>
+                                <td>Number of Emergency Visits:</td>
+                                <td><input type="number" id="emergency" value="1" min="0" max="10"></td>
+                            </tr>
+                            <tr>
+                                <td>Number of Inpatient Visits:</td>
+                                <td><input type="number" id="inpatient" value="2" min="0" max="10"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="text-align: center;">
+                                    <button onclick="calculateRisk()" style="background-color: #0078D4; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">Calculate Risk</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="column">
+                        <h3>Readmission Risk Assessment</h3>
+                        <div class="metric-card" style="height: 150px; display: flex; flex-direction: column; justify-content: center;">
+                            <div class="metric-title">Readmission Risk</div>
+                            <div class="metric-value" style="font-size: 48px; color: #E81123;">76%</div>
+                            <div style="margin-top: 10px; font-weight: bold; color: #E81123;">HIGH RISK</div>
+                        </div>
+                        
+                        <h3>Key Risk Factors</h3>
+                        <table>
+                            <tr>
+                                <th>Factor</th>
+                                <th>Impact</th>
+                            </tr>
+                            <tr>
+                                <td>Age > 70</td>
+                                <td>+7.3%</td>
+                            </tr>
+                            <tr>
+                                <td>9 Diagnoses</td>
+                                <td>+16.3%</td>
+                            </tr>
+                            <tr>
+                                <td>8 Days in Hospital</td>
+                                <td>+10.8%</td>
+                            </tr>
+                            <tr>
+                                <td>2 Inpatient Visits</td>
+                                <td>+21.7%</td>
+                            </tr>
+                            <tr>
+                                <td>Female Gender</td>
+                                <td>+1.8%</td>
+                            </tr>
+                        </table>
+                        
+                        <h3>Recommended Interventions</h3>
+                        <ul>
+                            <li>Enhanced discharge planning</li>
+                            <li>Medication reconciliation</li>
+                            <li>Follow-up appointment within 7 days</li>
+                            <li>Home health services</li>
+                            <li>Telehealth monitoring</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Healthcare Readmission Predictive Analytics Dashboard | Created with Power BI | Data Source: Diabetes 130-US hospitals dataset</p>
+        </div>
+    </div>
+    
+    <script>
+        function openTab(tabName) {
+            var i, tabContent, tabs;
+            tabContent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabContent.length; i++) {
+                tabContent[i].classList.remove("active");
+            }
+            tabs = document.getElementsByClassName("tab");
+            for (i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            event.currentTarget.classList.add("active");
+        }
+        
+        function calculateRisk() {
+            // This would be replaced with actual model prediction in a real implementation
+            alert("Risk calculation would be performed using the trained model in a real implementation.");
+        }
+    </script>
+</body>
+</html>

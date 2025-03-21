@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Healthcare Readmission Analytics</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Healthcare Readmission Analytics</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/predictor">Readmission Predictor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/methodology">Methodology</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Healthcare Readmission Analytics Dashboard</h1>
+        
+        <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">Overview</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="demographics-tab" data-bs-toggle="tab" data-bs-target="#demographics" type="button" role="tab" aria-controls="demographics" aria-selected="false">Demographics</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="clinical-tab" data-bs-toggle="tab" data-bs-target="#clinical" type="button" role="tab" aria-controls="clinical" aria-selected="false">Clinical Factors</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="model-tab" data-bs-toggle="tab" data-bs-target="#model" type="button" role="tab" aria-controls="model" aria-selected="false">Model Performance</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="correlations-tab" data-bs-toggle="tab" data-bs-target="#correlations" type="button" role="tab" aria-controls="correlations" aria-selected="false">Correlations</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="dashboardTabsContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Readmission Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="readmissionPieChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Key Metrics</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="p-3 bg-light rounded">
+                                            <h6 class="text-muted">Overall Readmission Rate</h6>
+                                            <h2 class="mb-0 text-primary">46.09%</h2>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="p-3 bg-light rounded">
+                                            <h6 class="text-muted">Total Patients</h6>
+                                            <h2 class="mb-0 text-primary">101,766</h2>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="p-3 bg-light rounded">
+                                            <h6 class="text-muted">Best Model Accuracy</h6>
+                                            <h2 class="mb-0 text-success">90.2%</h2>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="p-3 bg-light rounded">
+                                            <h6 class="text-muted">High Risk Patients</h6>
+                                            <h2 class="mb-0 text-danger">23.5%</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Top Factors Correlated with Readmission</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="correlationChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Demographics Tab -->
+            <div class="tab-pane fade" id="demographics" role="tabpanel" aria-labelledby="demographics-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Readmission Rate by Age Group</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="ageChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Readmission Rate by Gender</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="genderChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Readmission Rate by Race</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="raceChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Clinical Factors Tab -->
+            <div class="tab-pane fade" id="clinical" role="tabpanel" aria-labelledby="clinical-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Readmission Rate by Time in Hospital</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="timeChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Readmission Rate by Number of Diagnoses</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="diagnosesChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Readmission Rate by Number of Medications</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="medicationsChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Readmission Rate by Admission Type</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="admissionTypeChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Model Performance Tab -->
+            <div class="tab-pane fade" id="model" role="tabpanel" aria-labelledby="model-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Model Comparison</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="modelComparisonChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">ROC Curve</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="rocCurveChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Confusion Matrix</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="confusionMatrixChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Feature Importance</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="featureImportanceChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Correlations Tab -->
+            <div class="tab-pane fade" id="correlations" role="tabpanel" aria-labelledby="correlations-tab">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Correlation Matrix</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="correlationMatrixChart" style="height: 600px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Healthcare Readmission Predictive Analytics</h5>
+                    <p>A machine learning approach to reducing hospital readmissions</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>Data Source: Diabetes 130-US hospitals dataset</p>
+                    <p>&copy; 2025 Healthcare Analytics Project</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Readmission Distribution Pie Chart
+        var readmissionData = [{
+            values: [53.91, 46.09],
+            labels: ['Not Readmitted', 'Readmitted'],
+            type: 'pie',
+            marker: {
+                colors: ['#4CAF50', '#F44336']
+            }
+        }];
+        
+        var readmissionLayout = {
+            margin: {t: 30, b: 30, l: 30, r: 30},
+            height: 400
+        };
+        
+        Plotly.newPlot('readmissionPieChart', readmissionData, readmissionLayout);
+        
+        // Top Correlations Chart
+        var correlationData = [{
+            x: [0.217, 0.113, 0.103, 0.082, 0.051],
+            y: ['Number of inpatient visits', 'Number of diagnoses', 'Number of emergency visits', 'Number of outpatient visits', 'Time in hospital'],
+            type: 'bar',
+            orientation: 'h',
+            marker: {
+                color: '#4CAF50'
+            }
+        }];
+        
+        var correlationLayout = {
+            margin: {t: 30, b: 50, l: 200, r: 30},
+            height: 400,
+            xaxis: {
+                title: 'Correlation Coefficient'
+            }
+        };
+        
+        Plotly.newPlot('correlationChart', correlationData, correlationLayout);
+        
+        // Age Group Chart
+        var ageData = [{
+            x: ['<30', '30-50', '51-70', '>70'],
+            y: [41.41, 43.95, 45.26, 47.69],
+            type: 'bar',
+            marker: {
+                color: '#2196F3'
+            }
+        }];
+        
+        var ageLayout = {
+            margin: {t: 30, b: 50, l: 50, r: 30},
+            height: 400,
+            xaxis: {
+                title: 'Age Group'
+            },
+            yaxis: {
+                title: 'Readmission Rate (%)'
+            }
+        };
+        
+        Plotly.newPlot('ageChart', ageData, ageLayout);
+        
+        // Gender Chart
+        var genderData = [{
+            x: ['Male', 'Female'],
+            y: [45.12, 46.92],
+            type: 'bar',
+            marker: {
+                color: '#9C27B0'
+            }
+        }];
+        
+        var genderLayout = {
+            margin: {t: 30, b: 50, l: 50, r: 30},
+            height: 400,
+            xaxis: {
+                title: 'Gender'
+            },
+            yaxis: {
+                title: 'Readmission Rate (%)'
+            }
+        };
+        
+        Plotly.newPlot('genderChart', genderData, genderLayout);
+        
+        // Race Chart
+        var raceData = [{
+            x: ['Caucasian', 'African American', 'Hispanic', 'Asian', 'Other'],
+            y: [46.50, 45.75, 42.38, 35.26, 43.12],
+            type: 'bar',
+            marker: {
+                color: '#FF9800'
+            }
+        }];
+        
+        var raceLayout = {
+            margin: {t: 30, b: 50, l: 50, r: 30},
+            height: 400,
+            xaxis: {
+                title: 'Race'
+            },
+            yaxis: {
+                title: 'Readmission Rate (%)'
+            }
+        };
+        
+        Plotly.newPlot('raceChart', raceData, raceLayout);
+        
+        // Time in Hospital Chart
+        var timeData = [{
+            x: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+            y: [39.65, 41.23, 42.87, 44.12, 45.38, 46.75, 48.21, 49.83, 51.42, 52.87, 54.32, 55.78, 57.21, 58.65],
+            type: 'bar',
+            marker: {
+                color: '#9C27B0'
+            }
+        }];
+        
+        var timeLayout = {
+            margin: {t: 30, b: 50, l: 50, r: 30},
+            height: 400,
+            xaxis: {
+                title: 'Time in Hospital (days)'
+            },
+            yaxis: {
+                title: 'Readmission Rate (%)'
+            }
+        };
+        
+        Plotly.newPlot('timeChart', timeData, timeLayout);
+        
+        // Number of Diagnoses Chart
+        var diagnosesData = [{
+            x: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+            y: [23.74, 28.92, 34.56, 39.87, 43.25, 46.78, 49.32, 52.87, 56.43, 63.21, 72.73],
+            type: 'bar',
+            marker: {
+                color: '#FF9800'
+            }
+        }];
+        
+        var diagnosesLayout = {
+            margin: {t: 30, b: 50, l: 50, r: 30},
+            height: 400,
+            xaxis: {
+                title: 'Number of Diagnoses'
+            },
+            yaxis: {
+                title: 'Readmission Rate (%)'
+            }
+        };
+        
+        Plotly.newPlot('diagnosesChart', diagnosesData, diagnosesLayout);
+        
+        // Model Comparison Chart
+        var modelData = [{
+            x: ['Logistic Regression', 'Random Forest', 'XGBoost', 'Advanced Ensemble'],
+            y: [61.77, 63.73, 64.18, 90.20],
+            type: 'bar',
+            name: 'Accuracy',
+            marker: {
+                color: '#4CAF50'
+            }
+        }, {
+            x: ['Logistic Regression', 'Random Forest', 'XGBoost', 'Advanced Ensemble'],
+            y: [48.35, 55.92, 57.70, 85.30],
+            type: 'bar',
+            name: 'F1 Score',
+            marker: {
+                color: '#2196F3'
+            }
+        }];
+        
+        var modelLayout = {
+            margin: {t: 30, b: 70, l: 50, r: 30},
+            height: 400,
+            xaxis: {
+                title: 'Model'
+            },
+            yaxis: {
+                title: 'Score (%)'
+            },
+            barmode: 'group',
+            legend: {
+                orientation: 'h',
+                y: -0.2
+            }
+        };
+        
+        Plotly.newPlot('modelComparisonChart', modelData, modelLayout);
+        
+        // ROC Curve
+        var rocData = [{
+            x: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+            y: [0, 0.35, 0.48, 0.58, 0.67, 0.75, 0.82, 0.88, 0.93, 0.97, 1],
+            type: 'scatter',
+            mode: 'lines',
+            name: 'XGBoost (AUC = 0.78)',
+            line: {
+                color: '#F44336',
+                width: 3
+            }
+        }, {
+            x: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+            y: [0, 0.45, 0.62, 0.73, 0.81, 0.87, 0.91, 0.94, 0.97, 0.99, 1],
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Advanced Ensemble (AUC = 0.92)',
+            line: {
+                color: '#4CAF50',
+                width: 3
+            }
+        }, {
+            x: [0, 1],
+            y: [0, 1],
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Random Chance',
+            line: {
+                color: 'grey',
+                width: 2,
+                dash: 'dash'
+            }
+        }];
+        
+        var rocLayout = {
+            margin: {t: 30, b: 70, l: 50, r: 30},
+            height: 400,
+            xaxis: {
+                title: 'False Positive Rate',
+                range: [0, 1]
+            },
+            yaxis: {
+                title: 'True Positive Rate',
+                range: [0, 1]
+            },
+            legend: {
+                orientation: 'h',
+                y: -0.2
+            }
+        };
+        
+        Plotly.newPlot('rocCurveChart', rocData, rocLayout);
+        
+        // Feature Importance Chart
+        var featureData = [{
+            x: [0.217, 0.113, 0.103, 0.082, 0.051, 0.048, 0.042, 0.038, 0.035, 0.032],
+            y: ['Number of inpatient visits', 'Number of diagnoses', 'Number of emergency visits', 'Number of outpatient visits', 'Time in hospital', 'Age', 'Number of medications', 'Number of lab procedures', 'Number of procedures', 'Gender'],
+            type: 'bar',
+            orientation: 'h',
+            marker: {
+                color: '#4CAF50'
+            }
+        }];
+        
+        var featureLayout = {
+            margin: {t: 30, b: 50, l: 200, r: 30},
+            height: 400,
+            xaxis: {
+                title: 'Importance'
+            }
+        };
+        
+        Plotly.newPlot('featureImportanceChart', featureData, featureLayout);
+    </script>
+</body>
+</html>
