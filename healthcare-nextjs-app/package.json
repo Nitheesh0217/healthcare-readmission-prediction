@@ -1,0 +1,25 @@
+{
+  "name": "healthcare-nextjs-app",
+  "version": "1.0.0",
+  "description": "Healthcare Readmission Predictive Analytics",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "keywords": [
+    "healthcare",
+    "readmission",
+    "predictive",
+    "analytics",
+    "nextjs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "next": "^14.2.25",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
