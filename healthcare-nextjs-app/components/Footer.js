@@ -10,10 +10,10 @@ export default function Footer() {
             <h5><i className="fas fa-hospital-user me-2"></i>Healthcare Readmission Predictive Analytics</h5>
             <p>A machine learning approach to reducing hospital readmissions</p>
             <div className="social-icons" style={{ marginTop: '1rem' }}>
-              <a href="#" style={{ color: 'white', marginRight: '1rem', fontSize: '1.2rem' }}>
+              <a href="https://github.com/Nitheesh0217" style={{ color: 'white', marginRight: '1rem', fontSize: '1.2rem' }}>
                 <i className="fab fa-github"></i>
               </a>
-              <a href="#" style={{ color: 'white', marginRight: '1rem', fontSize: '1.2rem' }}>
+              <a href="https://www.linkedin.com/in/nitheesh0217" style={{ color: 'white', marginRight: '1rem', fontSize: '1.2rem' }}>
                 <i className="fab fa-linkedin"></i>
               </a>
               <a href="#" style={{ color: 'white', marginRight: '1rem', fontSize: '1.2rem' }}>
