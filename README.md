@@ -64,5 +64,9 @@ The project aims to achieve:
 - Interactive dashboards for healthcare decision-makers
 - Efficient data storage and retrieval system
 
+## Predict Your Own Readmission Risk
+Try it out by inputting your own patient demographics and medical history on Healthcare Readmission Prediction
+https://healthcare-readmission-prediction-qthd.vercel.app/
+
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
