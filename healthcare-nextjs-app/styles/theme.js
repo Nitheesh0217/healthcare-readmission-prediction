@@ -101,11 +101,15 @@ const pieChartOptions = {
 
 // Theme configuration
 const theme = {
-  colors: chartColors,
-  fonts: {
-    body: "'Roboto', sans-serif",
-    heading: "'Roboto', sans-serif",
-    monospace: "monospace"
+  colors: {
+    primary: '#3498db',
+    primaryDark: '#2980b9',
+    secondary: '#9b59b6',
+    success: '#2ecc71',
+    warning: '#f39c12',
+    danger: '#e74c3c',
+    light: '#f8f9fa',
+    dark: '#2c3e50'
   },
   fontWeights: {
     light: 300,
