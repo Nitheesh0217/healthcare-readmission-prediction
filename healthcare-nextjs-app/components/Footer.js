@@ -13,7 +13,7 @@ export default function Footer() {
               <a href="https://github.com/Nitheesh0217" style={{ color: 'white', marginRight: '1rem', fontSize: '1.2rem' }}>
                 <i className="fab fa-github"></i>
               </a>
-              <a href="https://www.linkedin.com/in/nitheesh0217" style={{ color: 'white', marginRight: '1rem', fontSize: '1.2rem' }}>
+              <a href="https://www.linkedin.com/in/nitheeshd" style={{ color: 'white', marginRight: '1rem', fontSize: '1.2rem' }}>
                 <i className="fab fa-linkedin"></i>
               </a>
               <a href="#" style={{ color: 'white', marginRight: '1rem', fontSize: '1.2rem' }}>
