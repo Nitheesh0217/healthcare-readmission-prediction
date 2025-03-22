@@ -1,38 +1,60 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { Pie, Bar, Line } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement } from 'chart.js';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Breadcrumb from '../components/Breadcrumb';
 import LinkButton from '../components/LinkButton';
 import theme from '../styles/theme';
 
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  PointElement,
+  LineElement
+);
+
 export default function Dashboard() {
+ export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [chartData, setChartData] = useState({
+    readmissionDistribution: { readmitted: 40, notReadmitted: 60 }
+  });
+
   useEffect(() => {
-    // Initialize tabs functionality
-    const tabLinks = document.querySelectorAll('.nav-tab');
-    const tabContents = document.querySelectorAll('.tab-pane');
-    
-    tabLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        // Remove active class from all tabs
-        tabLinks.forEach(tab => tab.classList.remove('active'));
-        tabContents.forEach(content => content.classList.remove('active'));
-        
-        // Add active class to current tab
-        e.currentTarget.classList.add('active');
-        const target = e.currentTarget.getAttribute('href').substring(1);
-        document.getElementById(target).classList.add('active');
-      });
-    });
-    
-    // Cleanup event listeners on unmount
-    return () => {
-      tabLinks.forEach(link => {
-        link.removeEventListener('click', () => {});
-      });
-    };
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 500);
   }, []);
+
+  const pieData = {
+    labels: ['Readmitted', 'Not Readmitted'],
+    datasets: [
+      {
+        data: [chartData.readmissionDistribution.readmitted, chartData.readmissionDistribution.notReadmitted],
+        backgroundColor: [theme.colors.primary, '#e0e0e0'],
+        borderColor: ['white', 'white'],
+        borderWidth: 2,
+        hoverOffset: 10
+      },
+    ],
+  };
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <div>
+        <Pie data={pieData} />
+      </div>
+    </div>
+  );
+}
   
   return (
     <div>
