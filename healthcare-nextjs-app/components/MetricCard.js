@@ -1,50 +1,40 @@
 import React from 'react';
-import Link from 'next/link';
 import theme from '../styles/theme';
 
-export default function Navbar() {
-  const [isOpen, setIsOpen] = React.useState(false);
-  
+export default function MetricCard({ title, value, icon, color, change }) {
   return (
-    <nav className="navbar">
-      <div className="container">
-        <div className="navbar-brand">
-          <Link href="/" className="navbar-logo">
-            <i className="fas fa-heartbeat" style={{ marginRight: '0.5rem', color: theme.colors.primary }}></i>
-            <span>Healthcare Analytics</span>
-          </Link>
-          
-          <button 
-            className="navbar-toggle" 
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle navigation"
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        </div>
-        
-        <div className={`navbar-menu ${isOpen ? 'is-open' : ''}`}>
-          <div className="navbar-end">
-            <Link href="/" className="navbar-item">
-              Home
-            </Link>
-            <Link href="/dashboard" className="navbar-item">
-              Dashboard
-            </Link>
-            <Link href="/predictor" className="navbar-item">
-              Predictor
-            </Link>
-            <Link href="/methodology" className="navbar-item">
-              Methodology
-            </Link>
-            <Link href="/about" className="navbar-item">
-              About
-            </Link>
-          </div>
+    <div className="metric-card card">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+        <h3 style={{ margin: 0 }}>{title}</h3>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          backgroundColor: `${color}30`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <i className={`fas ${icon}`} style={{ color }}></i>
         </div>
       </div>
-    </nav>
+      <div className="value" style={{ color }}>
+        {value}
+      </div>
+      {change && (
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          fontSize: '0.8rem',
+          color: '#7f8c8d',
+          marginTop: '0.5rem'
+        }}>
+          <span>vs. Previous Period</span>
+          <span style={{ 
+            color: change.startsWith('+') ? theme.colors.secondary : theme.colors.danger 
+          }}>{change}</span>
+        </div>
+      )}
+    </div>
   );
 }
