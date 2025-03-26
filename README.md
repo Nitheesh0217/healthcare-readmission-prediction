@@ -3,35 +3,17 @@
 ## Project Overview
 This project aims to develop a predictive analytics solution for healthcare patient readmission using machine learning and statistical modeling. By analyzing patterns in patient data, we can identify high-risk patients and help hospitals implement preventive measures to reduce unnecessary readmissions.
 
-## Objectives
-1. **Predict Readmission Risk**: Develop machine learning models to classify whether a patient will be readmitted
-2. **Data-Driven Decision Making**: Analyze key medical and demographic factors influencing readmissions
-3. **Power BI Visualization**: Create interactive dashboards to visualize trends in readmissions
-4. **SQL Integration**: Store and retrieve patient data efficiently for scalability
-5. **High Accuracy Models**: Implement advanced techniques to achieve >90% prediction accuracy
+## Project Demonstration
+**Visualizing Key Components of the Solution**
 
-## Dataset
-- **Dataset Name**: Diabetes 130-US hospitals dataset
-- **Source**: UCI Machine Learning Repository
-- **Records**: 101,766 patient encounters
-- **Key Features**: Patient demographics, hospitalization details, medical history, medications
-- **Target Variable**: Whether a patient was readmitted
+![Power BI Dashboard](images/dashboard_preview.png)  
+*Figure 1: Interactive Power BI dashboard showing readmission trends and risk factors*
 
-## Project Structure
-```
-healthcare-readmission-prediction/
-├── data/                      # Data files
-│   ├── raw/                   # Original dataset files
-│   └── processed/             # Cleaned and processed data
-├── notebooks/                 # Jupyter notebooks for EDA
-├── scripts/                   # Python scripts
-├── models/                    # Trained ML models
-│   └── advanced/              # Advanced models with >90% accuracy
-├── sql/                       # SQL database scripts
-├── powerbi/                   # Power BI dashboard files
-└── docs/                      # Documentation
-```
+![Model Performance](images/roc_curve_comparison.png)  
+*Figure 2: ROC curve comparison of different machine learning models*
 
+![Web Application](images/web_interface.png)  
+*Figure 3: Patient risk assessment interface for real-time predictions*
 ## Implementation Plan
 1. **Data Preprocessing**: Handle missing values, encode categorical variables, feature engineering
 2. **Exploratory Data Analysis**: Analyze readmission patterns and correlations
