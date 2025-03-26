@@ -6,13 +6,14 @@ This project aims to develop a predictive analytics solution for healthcare pati
 ## Project Demonstration
 **Visualizing Key Components of the Solution**
 
-![Power BI Dashboard](images/dashboard_preview.png)  
-*Figure 1: Interactive Power BI dashboard showing readmission trends and risk factors*
+![Home Dashboard](models/home.png) 
+![Dashboard](models/Dashboard.png)
+*Figure 1: Interactive dashboard showing readmission trends and risk factors*(models/home.png)  
 
 ![Model Performance](models/xgboost_with_smote_roc_curve.png)  
 *Figure 2: ROC curve comparison of different machine learning models*
 
-![Web Application](images/web_interface.png)  
+![Web Application](models/risk_Assessment.png)  
 *Figure 3: Patient risk assessment interface for real-time predictions*
 ## Implementation Plan
 1. **Data Preprocessing**: Handle missing values, encode categorical variables, feature engineering
