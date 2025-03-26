@@ -9,7 +9,7 @@ This project aims to develop a predictive analytics solution for healthcare pati
 ![Power BI Dashboard](images/dashboard_preview.png)  
 *Figure 1: Interactive Power BI dashboard showing readmission trends and risk factors*
 
-![Model Performance](images/roc_curve_comparison.png)  
+![Model Performance](models/xgboost_with_smote_roc_curve.png)  
 *Figure 2: ROC curve comparison of different machine learning models*
 
 ![Web Application](images/web_interface.png)  
