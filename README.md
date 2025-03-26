@@ -53,9 +53,9 @@ A predictive analytics solution leveraging machine learning to identify high-ris
 ## Technologies Used
 - **Machine Learning**: Scikit-learn, XGBoost, Imbalanced-learn
 - **Visualization**: Matplotlib, Seaborn, Power BI
-- **Database**: PostgreSQL, SQLAlchemy
-- **Web Framework**: Flask, React.js
-- **Deployment**: Docker, Vercel
+- **Database**: PostgreSQL
+- **Web Framework**: React.js, Next.js
+- **Deployment**: Vercel
 
 ## Getting Started
 1. **Clone Repository**
@@ -67,31 +67,18 @@ A predictive analytics solution leveraging machine learning to identify high-ris
    pip install -r requirements.txt
    conda install --file conda_requirements.txt  # (if using conda)
 3. **Database Configuration**
-   ```bash
+   ```sql
    -- Create PostgreSQL database
    CREATE DATABASE readmission_pred;
    \i sql/schema.sql 
-
-
-
-### Data Processing
-
-python scripts/data_preprocessing.py \
-  --input data/raw/diabetes.csv \
-  --output data/processed/cleaned_data.csv
-  
-## Model Training
-
-python scripts/model_development.py \
-  --data data/processed/cleaned_data.csv \
-  --model_output models/production_model.pkl
-  
-## Launch Dashboard
-
-Open powerbi/readmission_dashboard.pbix
-
+4. **Data Processing**
+   ```bash
+   python scripts/data_preprocessing.py --input data/raw/ --output data/processed/
+   python scripts/model_development.py --data data/processed/ --output models/
+5. **Launch Dashboard**
+   ```bash
+   Open powerbi/readmission_dashboard.pbix
 Connect to your PostgreSQL instance
-
 Refresh data connections
 
 ## Key Results
@@ -101,7 +88,8 @@ Accuracy	91.2%
 ROC-AUC Score	0.92
 Precision (High Risk)	89.5%
 Recall (High Risk)	82.7%
-Top Risk Factors Identified:
+
+## Top Risk Factors Identified:
 
 Number of inpatient visits (4.2× risk)
 
@@ -109,5 +97,11 @@ HbA1c level > 7% (3.8× risk)
 
 Insulin dosage changes (2.9× risk)
 
-Live Prediction Interface
+## Live Prediction Interface
 Access the production deployment for real-time risk assessments:
+https://healthcare-readmission-prediction-qthd.vercel.app/
+
+## License
+This project is licensed under the MIT License - see LICENSE for details.
+
+
