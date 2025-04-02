@@ -1,23 +1,15 @@
-// /pages/_app.js
-import { motion, AnimatePresence } from 'framer-motion';
-import Layout from '../components/Layout';
 import '../styles/globals.css';
+import Head from 'next/head';
 
-function MyApp({ Component, pageProps, router }) {
+function MyApp({ Component, pageProps }) {
   return (
-    <Layout>
-      <AnimatePresence exitBeforeEnter>
-        <motion.div
-          key={router.route}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Component {...pageProps} />
-        </motion.div>
-      </AnimatePresence>
-    </Layout>
+    <>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+      </Head>
+      <Component {...pageProps} />
+    </>
   );
 }
 
