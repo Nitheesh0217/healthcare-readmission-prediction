@@ -1,239 +1,433 @@
-import { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import Breadcrumb from '../components/Breadcrumb';
-import LinkButton from '../components/LinkButton';
+import React, { useState } from 'react';
+import Layout from '../components/Layout';
 import theme from '../styles/theme';
 
 export default function Predictor() {
+  const [activeTab, setActiveTab] = useState('basic');
   const [formData, setFormData] = useState({
     age: 65,
-    gender: 0, // 0: Male, 1: Female
-    race: 0, // 0: Caucasian, 1: African American, 2: Other
-    time_in_hospital: 5,
-    num_lab_procedures: 45,
-    num_procedures: 1,
-    num_medications: 15,
-    number_outpatient: 0,
-    number_emergency: 0,
-    number_inpatient: 1,
-    number_diagnoses: 7,
-    max_glu_serum: 0, // 0: None, 1: Norm, 2: >200, 3: >300
-    a1c_result: 0, // 0: None, 1: Norm, 2: >7, 3: >8
-    admission_type: 1, // 1: Emergency, 2: Urgent, 3: Elective
-    discharge_disposition: 1, // 1: Home, etc.
-    admission_source: 7 // 7: Emergency Room
+    gender: 'Male',
+    race: 'Caucasian',
+    timeInHospital: 5,
+    numPreviousVisits: 1,
+    numDiagnoses: 7,
+    numMedications: 15,
+    diabetesMed: true,
+    insulin: false,
+    emergencyAdmission: false,
+    a1cTest: true,
+    glucoseTest: true
   });
-  
   const [prediction, setPrediction] = useState(null);
-  const [loading, setLoading] = useState(false);
-  
-  const handleChange = (e) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value
+    });
+  };
+
+  const handleSliderChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: parseInt(value)
     });
   };
-  
-  const handleSubmit = (e) => {
+
+  const handleReset = () => {
+    setFormData({
+      age: 65,
+      gender: 'Male',
+      race: 'Caucasian',
+      timeInHospital: 5,
+      numPreviousVisits: 1,
+      numDiagnoses: 7,
+      numMedications: 15,
+      diabetesMed: true,
+      insulin: false,
+      emergencyAdmission: false,
+      a1cTest: true,
+      glucoseTest: true
+    });
+    setPrediction(null);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     
-    // Simulate API call with setTimeout
-    setTimeout(() => {
-      // This is a simplified prediction logic similar to the Flask app
-      let risk_score = 0;
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Age factor
-      if (formData.age < 30) risk_score += 10;
-      else if (formData.age < 50) risk_score += 20;
-      else if (formData.age < 70) risk_score += 30;
-      else risk_score += 40;
+      // Calculate risk score based on form data (simplified example)
+      const ageRisk = formData.age > 70 ? 20 : formData.age > 50 ? 15 : formData.age > 30 ? 10 : 5;
+      const visitRisk = formData.numPreviousVisits * 5;
+      const diagnosisRisk = formData.numDiagnoses * 2;
+      const medicationRisk = formData.numMedications * 0.5;
+      const stayRisk = formData.timeInHospital * 2;
+      const emergencyRisk = formData.emergencyAdmission ? 10 : 0;
       
-      // Number of diagnoses factor
-      risk_score += formData.number_diagnoses * 5;
-      
-      // Time in hospital factor
-      risk_score += formData.time_in_hospital * 3;
-      
-      // Number of inpatient visits factor
-      risk_score += formData.number_inpatient * 10;
-      
-      // Normalize to 0-100
-      risk_score = Math.min(Math.max(risk_score, 0), 100);
+      const totalRisk = ageRisk + visitRisk + diagnosisRisk + medicationRisk + stayRisk + emergencyRisk;
+      const riskScore = Math.min(Math.round(totalRisk), 100);
       
       // Determine risk level
-      let risk_level, risk_color, prediction_value;
-      if (risk_score < 30) {
-        risk_level = 'Low';
-        risk_color = theme.colors.success;
-        prediction_value = 0;
-      } else if (risk_score < 60) {
-        risk_level = 'Medium';
-        risk_color = theme.colors.warning;
-        prediction_value = risk_score > 45 ? 1 : 0;
-      } else {
-        risk_level = 'High';
-        risk_color = theme.colors.danger;
-        prediction_value = 1;
+      let riskLevel;
+      if (riskScore < 30) riskLevel = 'LOW RISK';
+      else if (riskScore < 60) riskLevel = 'MEDIUM RISK';
+      else riskLevel = 'HIGH RISK';
+      
+      // Generate risk factors
+      const riskFactors = [];
+      
+      if (formData.age > 70) {
+        riskFactors.push({
+          factor: 'Advanced Age',
+          description: `Patient is ${formData.age} years old, increasing readmission risk.`,
+          impact: 'HIGH'
+        });
       }
       
-      // Determine risk factors
-      const risk_factors = [];
-      if (formData.age >= 70) risk_factors.push('Advanced age (over 70 years)');
-      if (formData.number_diagnoses >= 9) risk_factors.push('High number of diagnoses (9+)');
-      if (formData.time_in_hospital >= 8) risk_factors.push('Extended hospital stay (8+ days)');
-      if (formData.number_inpatient >= 2) risk_factors.push('Multiple previous inpatient visits');
-      
-      // Determine interventions
-      const interventions = [];
-      if (prediction_value === 1) {
-        interventions.push('Schedule follow-up appointment within 7 days of discharge');
-        interventions.push('Provide detailed medication reconciliation and education');
-        
-        if (formData.number_diagnoses >= 9) {
-          interventions.push('Coordinate care with specialists for multiple conditions');
-        }
-        
-        if (formData.age >= 70) {
-          interventions.push('Arrange home health services for post-discharge support');
-        }
-        
-        if (formData.time_in_hospital >= 8) {
-          interventions.push('Implement comprehensive discharge planning with social work consultation');
-        }
-        
-        if (formData.number_inpatient >= 2) {
-          interventions.push('Enroll in chronic care management program');
-        }
-      } else {
-        interventions.push('Standard follow-up appointment within 30 days');
-        interventions.push('Provide discharge instructions and medication list');
+      if (formData.numPreviousVisits > 0) {
+        riskFactors.push({
+          factor: 'Previous Inpatient Visits',
+          description: `Patient has ${formData.numPreviousVisits} previous inpatient visits.`,
+          impact: 'MEDIUM'
+        });
       }
       
+      if (formData.numDiagnoses > 5) {
+        riskFactors.push({
+          factor: 'Multiple Diagnoses',
+          description: `Patient has ${formData.numDiagnoses} diagnoses.`,
+          impact: 'MEDIUM'
+        });
+      }
+      
+      if (formData.numMedications > 10) {
+        riskFactors.push({
+          factor: 'Multiple Medications',
+          description: `Patient is on ${formData.numMedications} medications, increasing risk of interactions.`,
+          impact: 'MEDIUM'
+        });
+      }
+      
+      if (formData.timeInHospital > 7) {
+        riskFactors.push({
+          factor: 'Extended Hospital Stay',
+          description: `Patient's hospital stay of ${formData.timeInHospital} days increases readmission risk.`,
+          impact: 'MEDIUM'
+        });
+      }
+      
+      if (formData.emergencyAdmission) {
+        riskFactors.push({
+          factor: 'Emergency Admission',
+          description: 'Patient was admitted through emergency, indicating potential severity.',
+          impact: 'HIGH'
+        });
+      }
+      
+      // Set prediction result
       setPrediction({
-        prediction: prediction_value,
-        probability: risk_score,
-        risk_level,
-        risk_color,
-        risk_factors,
-        interventions
+        score: riskScore,
+        level: riskLevel,
+        riskFactors: riskFactors
       });
-      
-      setLoading(false);
-    }, 1000);
+    } catch (error) {
+      console.error('Error predicting readmission risk:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
-  
+
   return (
-    <div>
-      <Navbar />
-      <Breadcrumb />
+    <Layout 
+      title="Predictor" 
+      description="Predict patient readmission risk using our advanced machine learning model"
+    >
+      <div className="hero-section">
+        <div className="container">
+          <h1>
+            Readmission Risk Predictor
+          </h1>
+          <p className="lead">
+            Enter patient information to predict the risk of hospital readmission
+          </p>
+        </div>
+      </div>
       
-      <div className="container" style={{ padding: '1rem 0 3rem' }}>
-        <h1>Readmission Risk Predictor</h1>
-        <p className="lead">Enter patient information to predict readmission risk</p>
-        
-        <div className="row" style={{ marginTop: '2rem' }}>
+      <div className="container" style={{ marginTop: '-30px', marginBottom: '3rem' }}>
+        <div className="row">
           <div className="col-6">
             <div className="card">
               <h3>Patient Information</h3>
-              <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '1rem' }}>
-                  <label htmlFor="age" style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem' }}>Age</label>
-                  <input 
-                    type="number" 
-                    id="age" 
-                    name="age" 
-                    value={formData.age} 
-                    onChange={handleChange} 
-                    min="0" 
-                    max="100"
-                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}
-                  />
-                </div>
-                
-                <div style={{ marginBottom: '1rem' }}>
-                  <label htmlFor="gender" style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem' }}>Gender</label>
-                  <select 
-                    id="gender" 
-                    name="gender" 
-                    value={formData.gender} 
-                    onChange={handleChange}
-                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}
-                  >
-                    <option value="0">Male</option>
-                    <option value="1">Female</option>
-                  </select>
-                </div>
-                
-                <div style={{ marginBottom: '1rem' }}>
-                  <label htmlFor="time_in_hospital" style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem' }}>Time in Hospital (days)</label>
-                  <input 
-                    type="number" 
-                    id="time_in_hospital" 
-                    name="time_in_hospital" 
-                    value={formData.time_in_hospital} 
-                    onChange={handleChange} 
-                    min="1" 
-                    max="30"
-                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}
-                  />
-                </div>
-                
-                <div style={{ marginBottom: '1rem' }}>
-                  <label htmlFor="number_diagnoses" style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem' }}>Number of Diagnoses</label>
-                  <input 
-                    type="number" 
-                    id="number_diagnoses" 
-                    name="number_diagnoses" 
-                    value={formData.number_diagnoses} 
-                    onChange={handleChange} 
-                    min="1" 
-                    max="20"
-                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}
-                  />
-                </div>
-                
-                <div style={{ marginBottom: '1rem' }}>
-                  <label htmlFor="number_inpatient" style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem' }}>Number of Previous Inpatient Visits</label>
-                  <input 
-                    type="number" 
-                    id="number_inpatient" 
-                    name="number_inpatient" 
-                    value={formData.number_inpatient} 
-                    onChange={handleChange} 
-                    min="0" 
-                    max="10"
-                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}
-                  />
-                </div>
-                
+              
+              <div style={{ display: 'flex', marginTop: '1.5rem', marginBottom: '1.5rem', borderBottom: '1px solid #eee' }}>
                 <button 
-                  type="submit" 
-                  className="btn btn-primary" 
+                  className={`btn ${activeTab === 'basic' ? 'btn-primary' : 'btn-outline'}`}
                   style={{ 
-                    marginTop: '1rem', 
-                    width: '100%', 
-                    padding: '0.75rem',
-                    backgroundColor: loading ? '#7f8c8d' : theme.colors.primary,
-                    borderColor: loading ? '#7f8c8d' : theme.colors.primary,
-                    cursor: loading ? 'not-allowed' : 'pointer'
+                    marginRight: '0.5rem', 
+                    borderRadius: '4px 4px 0 0',
+                    borderBottom: activeTab === 'basic' ? '2px solid #3498db' : 'none'
                   }}
-                  disabled={loading}
+                  onClick={() => setActiveTab('basic')}
                 >
-                  {loading ? (
-                    <>
-                      <i className="fas fa-spinner fa-spin me-2"></i>
-                      Calculating...
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-calculator me-2"></i>
-                      Predict Readmission Risk
-                    </>
-                  )}
+                  <i className="fas fa-user me-2"></i>
+                  Basic Info
                 </button>
+                <button 
+                  className={`btn ${activeTab === 'medical' ? 'btn-primary' : 'btn-outline'}`}
+                  style={{ 
+                    marginRight: '0.5rem', 
+                    borderRadius: '4px 4px 0 0',
+                    borderBottom: activeTab === 'medical' ? '2px solid #3498db' : 'none'
+                  }}
+                  onClick={() => setActiveTab('medical')}
+                >
+                  <i className="fas fa-heartbeat me-2"></i>
+                  Medical History
+                </button>
+                <button 
+                  className={`btn ${activeTab === 'advanced' ? 'btn-primary' : 'btn-outline'}`}
+                  style={{ 
+                    borderRadius: '4px 4px 0 0',
+                    borderBottom: activeTab === 'advanced' ? '2px solid #3498db' : 'none'
+                  }}
+                  onClick={() => setActiveTab('advanced')}
+                >
+                  <i className="fas fa-cog me-2"></i>
+                  Advanced
+                </button>
+              </div>
+              
+              <form onSubmit={handleSubmit}>
+                {activeTab === 'basic' && (
+                  <div>
+                    <div className="form-group">
+                      <label className="form-label">Age</label>
+                      <div className="range-slider">
+                        <input 
+                          type="range" 
+                          name="age" 
+                          min="0" 
+                          max="100" 
+                          value={formData.age} 
+                          onChange={handleSliderChange}
+                        />
+                        <div style={{ textAlign: 'center' }}>{formData.age} years</div>
+                      </div>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label className="form-label">Gender</label>
+                      <select 
+                        className="form-select" 
+                        name="gender" 
+                        value={formData.gender} 
+                        onChange={handleInputChange}
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </select>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label className="form-label">Race</label>
+                      <select 
+                        className="form-select" 
+                        name="race" 
+                        value={formData.race} 
+                        onChange={handleInputChange}
+                      >
+                        <option value="Caucasian">Caucasian</option>
+                        <option value="African American">African American</option>
+                        <option value="Asian">Asian</option>
+                        <option value="Hispanic">Hispanic</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label className="form-label">Time in Hospital (days)</label>
+                      <div className="range-slider">
+                        <input 
+                          type="range" 
+                          name="timeInHospital" 
+                          min="1" 
+                          max="14" 
+                          value={formData.timeInHospital} 
+                          onChange={handleSliderChange}
+                        />
+                        <div style={{ textAlign: 'center' }}>{formData.timeInHospital} days</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {activeTab === 'medical' && (
+                  <div>
+                    <div className="form-group">
+                      <label className="form-label">Number of Previous Inpatient Visits</label>
+                      <div className="range-slider">
+                        <input 
+                          type="range" 
+                          name="numPreviousVisits" 
+                          min="0" 
+                          max="10" 
+                          value={formData.numPreviousVisits} 
+                          onChange={handleSliderChange}
+                        />
+                        <div style={{ textAlign: 'center' }}>{formData.numPreviousVisits}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label className="form-label">Number of Diagnoses</label>
+                      <div className="range-slider">
+                        <input 
+                          type="range" 
+                          name="numDiagnoses" 
+                          min="1" 
+                          max="15" 
+                          value={formData.numDiagnoses} 
+                          onChange={handleSliderChange}
+                        />
+                        <div style={{ textAlign: 'center' }}>{formData.numDiagnoses}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label className="form-label">Number of Medications</label>
+                      <div className="range-slider">
+                        <input 
+                          type="range" 
+                          name="numMedications" 
+                          min="0" 
+                          max="30" 
+                          value={formData.numMedications} 
+                          onChange={handleSliderChange}
+                        />
+                        <div style={{ textAlign: 'center' }}>{formData.numMedications}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="form-group">
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input 
+                          type="checkbox" 
+                          id="diabetesMed" 
+                          name="diabetesMed" 
+                          checked={formData.diabetesMed} 
+                          onChange={handleInputChange}
+                          style={{ marginRight: '0.5rem' }}
+                        />
+                        <label htmlFor="diabetesMed">Diabetes Medication</label>
+                      </div>
+                    </div>
+                    
+                    <div className="form-group">
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input 
+                          type="checkbox" 
+                          id="insulin" 
+                          name="insulin" 
+                          checked={formData.insulin} 
+                          onChange={handleInputChange}
+                          style={{ marginRight: '0.5rem' }}
+                        />
+                        <label htmlFor="insulin">Insulin Treatment</label>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {activeTab === 'advanced' && (
+                  <div>
+                    <div className="form-group">
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input 
+                          type="checkbox" 
+                          id="emergencyAdmission" 
+                          name="emergencyAdmission" 
+                          checked={formData.emergencyAdmission} 
+                          onChange={handleInputChange}
+                          style={{ marginRight: '0.5rem' }}
+                        />
+                        <label htmlFor="emergencyAdmission">Emergency Admission</label>
+                      </div>
+                    </div>
+                    
+                    <div className="form-group">
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input 
+                          type="checkbox" 
+                          id="a1cTest" 
+                          name="a1cTest" 
+                          checked={formData.a1cTest} 
+                          onChange={handleInputChange}
+                          style={{ marginRight: '0.5rem' }}
+                        />
+                        <label htmlFor="a1cTest">A1C Test Performed</label>
+                      </div>
+                    </div>
+                    
+                    <div className="form-group">
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input 
+                          type="checkbox" 
+                          id="glucoseTest" 
+                          name="glucoseTest" 
+                          checked={formData.glucoseTest} 
+                          onChange={handleInputChange}
+                          style={{ marginRight: '0.5rem' }}
+                        />
+                        <label htmlFor="glucoseTest">Glucose Test Performed</label>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
+                  <button 
+                    type="button" 
+                    className="btn btn-outline" 
+                    onClick={handleReset}
+                    style={{ display: 'flex', alignItems: 'center' }}
+                  >
+                    <i className="fas fa-undo me-2"></i>
+                    Reset
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary" 
+                    disabled={isLoading}
+                    style={{ display: 'flex', alignItems: 'center' }}
+                  >
+                    {isLoading ? (
+                      <>
+                        <div style={{
+                          width: '16px',
+                          height: '16px',
+                          border: '2px solid rgba(255, 255, 255, 0.3)',
+                          borderRadius: '50%',
+                          borderTopColor: 'white',
+                          animation: 'spin 1s ease-in-out infinite',
+                          marginRight: '0.5rem'
+                        }}></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-calculator me-2"></i>
+                        Predict Readmission Risk
+                      </>
+                    )}
+                  </button>
+                </div>
               </form>
             </div>
           </div>
@@ -241,67 +435,150 @@ export default function Predictor() {
           <div className="col-6">
             {prediction ? (
               <div className="card">
-                <h3>Prediction Results</h3>
+                <h3>Readmission Risk Assessment</h3>
                 
-                <div style={{ textAlign: 'center', margin: '2rem 0' }}>
-                  <div style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Readmission Risk</div>
+                <div style={{ 
+                  textAlign: 'center', 
+                  marginTop: '2rem', 
+                  marginBottom: '2rem' 
+                }}>
                   <div style={{ 
-                    fontSize: '2.5rem', 
-                    fontWeight: 'bold', 
-                    color: prediction.risk_color,
-                    marginBottom: '0.5rem'
+                    fontSize: '4rem', 
+                    fontWeight: 'bold',
+                    color: prediction.score < 30 ? '#2ecc71' : 
+                           prediction.score < 60 ? '#f39c12' : '#e74c3c'
                   }}>
-                    {prediction.risk_level}
+                    {prediction.score}%
                   </div>
-                  <div style={{ fontSize: '1.2rem' }}>
-                    Risk Score: {prediction.probability}%
+                  <div style={{ 
+                    display: 'inline-block',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '20px',
+                    backgroundColor: prediction.score < 30 ? '#2ecc7120' : 
+                                     prediction.score < 60 ? '#f39c1220' : '#e74c3c20',
+                    color: prediction.score < 30 ? '#2ecc71' : 
+                           prediction.score < 60 ? '#f39c12' : '#e74c3c',
+                    fontWeight: 'bold',
+                    marginTop: '0.5rem'
+                  }}>
+                    {prediction.level}
                   </div>
                 </div>
                 
-                <div style={{ marginBottom: '2rem' }}>
-                  <h4>Risk Factors</h4>
-                  {prediction.risk_factors.length > 0 ? (
-                    <ul style={{ paddingLeft: '1.5rem' }}>
-                      {prediction.risk_factors.map((factor, index) => (
-                        <li key={index}>{factor}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>No significant risk factors identified.</p>
-                  )}
-                </div>
+                <h4>Key Risk Factors</h4>
                 
-                <div>
-                  <h4>Recommended Interventions</h4>
-                  <ul style={{ paddingLeft: '1.5rem' }}>
-                    {prediction.interventions.map((intervention, index) => (
-                      <li key={index}>{intervention}</li>
+                {prediction.riskFactors.length > 0 ? (
+                  <div style={{ marginTop: '1rem' }}>
+                    {prediction.riskFactors.map((factor, index) => (
+                      <div key={index} style={{ 
+                        padding: '1rem',
+                        marginBottom: '1rem',
+                        borderRadius: '8px',
+                        backgroundColor: factor.impact === 'HIGH' ? '#e74c3c10' : '#f39c1210',
+                        borderLeft: `4px solid ${factor.impact === 'HIGH' ? '#e74c3c' : '#f39c12'}`
+                      }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '0.5rem'
+                        }}>
+                          <h5 style={{ margin: 0 }}>{factor.factor}</h5>
+                          <span style={{ 
+                            padding: '0.25rem 0.5rem',
+                            borderRadius: '20px',
+                            backgroundColor: factor.impact === 'HIGH' ? '#e74c3c20' : '#f39c1220',
+                            color: factor.impact === 'HIGH' ? '#e74c3c' : '#f39c12',
+                            fontSize: '0.8rem',
+                            fontWeight: 'bold'
+                          }}>
+                            {factor.impact} IMPACT
+                          </span>
+                        </div>
+                        <p style={{ margin: 0, fontSize: '0.9rem' }}>{factor.description}</p>
+                      </div>
                     ))}
-                  </ul>
-                </div>
+                  </div>
+                ) : (
+                  <p>No significant risk factors identified.</p>
+                )}
                 
-                <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-                  <LinkButton 
-                    href="/dashboard" 
-                    variant="outline"
-                    icon="fa-chart-line"
-                  >
-                    View Analytics Dashboard
-                  </LinkButton>
+                <div style={{ 
+                  marginTop: '2rem',
+                  padding: '1rem',
+                  borderRadius: '8px',
+                  backgroundColor: '#3498db10',
+                  borderLeft: '4px solid #3498db'
+                }}>
+                  <h5 style={{ color: '#3498db' }}>Recommended Interventions</h5>
+                  <ul style={{ paddingLeft: '1.5rem', marginTop: '0.5rem' }}>
+                    {prediction.score >= 60 ? (
+                      <>
+                        <li>Schedule follow-up appointment within 7 days of discharge</li>
+                        <li>Implement comprehensive medication reconciliation</li>
+                        <li>Assign case manager for post-discharge coordination</li>
+                        <li>Provide enhanced patient education on warning signs</li>
+                        <li>Consider home health services</li>
+                      </>
+                    ) : prediction.score >= 30 ? (
+                      <>
+                        <li>Schedule follow-up appointment within 14 days of discharge</li>
+                        <li>Conduct medication review before discharge</li>
+                        <li>Provide patient education on self-management</li>
+                        <li>Ensure clear communication of discharge instructions</li>
+                      </>
+                    ) : (
+                      <>
+                        <li>Schedule routine follow-up appointment</li>
+                        <li>Provide standard discharge instructions</li>
+                        <li>Ensure patient has access to prescribed medications</li>
+                      </>
+                    )}
+                  </ul>
                 </div>
               </div>
             ) : (
-              <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                <i className="fas fa-user-md" style={{ fontSize: '4rem', color: theme.colors.primary, marginBottom: '1.5rem' }}></i>
-                <h3>Readmission Prediction</h3>
-                <p style={{ textAlign: 'center' }}>Enter patient information and click "Predict Readmission Risk" to see results.</p>
+              <div className="card" style={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                justifyContent: 'center', 
+                alignItems: 'center',
+                padding: '3rem',
+                height: '100%'
+              }}>
+                <div style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  backgroundColor: '#f8f9fa',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '1.5rem'
+                }}>
+                  <i className="fas fa-user-md" style={{ fontSize: '2rem', color: '#3498db' }}></i>
+                </div>
+                <h3>Enter Patient Information</h3>
+                <p style={{ textAlign: 'center', maxWidth: '400px', margin: '1rem 0' }}>
+                  Fill out the patient information form and click "Predict Readmission Risk" to get a personalized risk assessment and intervention recommendations.
+                </p>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                  {['Age', 'Gender', 'Diagnoses', 'Medications', 'Hospital Stay'].map((item, index) => (
+                    <div key={index} style={{ 
+                      padding: '0.5rem 1rem',
+                      borderRadius: '20px',
+                      backgroundColor: '#f8f9fa',
+                      fontSize: '0.9rem'
+                    }}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
         </div>
       </div>
-      
-      <Footer />
-    </div>
+    </Layout>
   );
 }
